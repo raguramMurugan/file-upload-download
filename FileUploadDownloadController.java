@@ -21,12 +21,12 @@ public class FileUploadDownloadController {
 	private FileServiceImpl fileService;
 	
 	@PostMapping("/fileUpload")
-	public ResponseEntity<?> fileUpload(@Valid @RequestParam("file") MultipartFile files)
+	public ResponseEntity<?> fileUpload(@RequestParam("file") MultipartFile files)
 	{
 		if(files!=null)
 		{
 			fileService.fileUpload(files);
-			return ErrorHandler.response(ErrorHandler.FILE_UPLOAD, HttpStatus.ACCEPTED);
+			return new ResponseEntity<>(ErrorHandler.FILE_UPLOAD,HttpStatus.ACCEPTED);
 		}
 		else
 		return ErrorHandler.response(ErrorHandler.FILE_UPLOAD_FAILED,HttpStatus.NOT_FOUND); 
@@ -45,12 +45,12 @@ public class FileUploadDownloadController {
 		return ErrorHandler.response(ErrorHandler.INVALID_FILE_UPLOAD, HttpStatus.UNAUTHORIZED);
 	}
 	@GetMapping("/getFileById/{id}")
-	public ResponseEntity<?> getFilesById(@Valid @PathVariable("id") Integer id)
+	public ResponseEntity<?> getFilesById(@PathVariable("id") Integer id)
 	{
 		if(id!=null)
 		{
 			ResponseEntity<?> files=fileService.getFilesById(id);
-			return ResponseEntity.status(HttpStatus.OK).body(files);
+			return ResponseEntity.status(HttpStatus.ACCEPTED).body(files);
 		}
 		else 
 		{
