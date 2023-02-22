@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,7 +53,7 @@ public class FileServiceImpl implements FileService{
 		}
 		if(fileAttachment!=null)
 		{
-			return ErrorHandler.response(ErrorHandler.FILE_UPLOAD, HttpStatus.ACCEPTED);
+			return new ResponseEntity<>(ErrorHandler.FILE_UPLOAD,HttpStatus.ACCEPTED);
 		}
 		else
 		return ErrorHandler.response(ErrorHandler.FILE_UPLOAD_FAILED, HttpStatus.BAD_REQUEST);
@@ -83,14 +84,14 @@ public class FileServiceImpl implements FileService{
 
 	}
 
-
 	public ResponseEntity<?> getFilesById(Integer id) {
 		Optional<FileAttachment> attachment=attachmentRepository.findById(id);
 		
 		if(attachment.isPresent())
 		{
 			attachment.get();
-			return ErrorHandler.response(ErrorHandler.FILE_RETRIEVED,HttpStatus.OK);
+			
+			return ResponseEntity.status(HttpStatus.ACCEPTED).body(attachment);
 		}
 		else {
 			return ErrorHandler.response(ErrorHandler.FILE_NOT_FOUND, HttpStatus.NOT_FOUND);
