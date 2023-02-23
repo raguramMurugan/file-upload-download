@@ -8,7 +8,7 @@ public class ErrorHandler {
 	
 	public static final String INVALID_FILE_UPLOAD="Uploaded file is not PDF";
 	
-	public static final String FILE_UPLOAD="File upload Sucessfully";
+	public static final String FILE_SIZE_EXCEEDS="File Size Exceeds, Please Upload file within 500Kb";
 	
 	public static final String FILE_UPLOAD_FAILED="File upload failed";
 	
@@ -22,8 +22,9 @@ public class ErrorHandler {
 	
 	public static final String FILE_ID_EMPTY="File id is Null";
 	
-	public static final String FILE_RETRIEVED="File retrieved Successfully";
+	public static final String FILE_UPLOAD="File Upload Successfully";
 	
+	public static final String FILE_RETRIVED="File Retrieved Successfully";
 	
 	public static ResponseEntity<?> response(String error, HttpStatus httpStatus)
 	{
@@ -43,11 +44,35 @@ public class ErrorHandler {
 			errorResponse.setError(error);
 			return new ResponseEntity<Object>(errorResponse,httpStatus);
 		}
+		else if(httpStatus.value()==406)
+		{
+			errorResponse.setError(error);
+			return new ResponseEntity<Object>(errorResponse,httpStatus);
+		}
 		else {
 			errorResponse.setError(error);
 			return new ResponseEntity<Object>(errorResponse,httpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 	}
+	
+	public static ResponseEntity<?> successResponse(String status, HttpStatus http)
+	{
+		SuccessResponse successResponse=new SuccessResponse();
+		if(http.value()==200)
+		{
+			successResponse.setStatus(status);
+			return new ResponseEntity<Object>(successResponse,http);
+		}
+		else 
+		if(http.value()==202)
+		{
+			successResponse.setStatus(status);
+			return new ResponseEntity<Object>(successResponse,http);
+		}
+		return new ResponseEntity<Object>(successResponse,http.ACCEPTED);
+		
+	}
 
 }
+
