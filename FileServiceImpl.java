@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.util.Base64;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.hubino.uploaddownload.fileuploaddownload.controller.FileUploadDownloadController;
 import com.hubino.uploaddownload.fileuploaddownload.dto.ErrorHandler;
 import com.hubino.uploaddownload.fileuploaddownload.dto.ErrorHandlerResponse;
 import com.hubino.uploaddownload.fileuploaddownload.entity.FileAttachment;
@@ -26,6 +29,8 @@ import jakarta.validation.Valid;
 
 @Service
 public class FileServiceImpl implements FileService{
+	
+	private static final Logger log=LoggerFactory.getLogger(FileServiceImpl.class);
 	
 	@Autowired
 	private FileAttachmentRepository attachmentRepository;
@@ -60,7 +65,7 @@ public class FileServiceImpl implements FileService{
 	}
 
 	
-	public String downloadFile(@Valid String filename)
+	public ResponseEntity<?> downloadFile(@Valid String filename)
 	{
 		
 		//getting the filename from the repository as an optional
@@ -76,25 +81,36 @@ public class FileServiceImpl implements FileService{
 				downloadedFile = Files.readAllBytes(new File(filePath).toPath());
 				//converting the ByteArray to Base64 String format
 				base64File=Base64.getEncoder().encodeToString(downloadedFile);
-				return base64File;
 			} catch (IOException e) {
 				ErrorHandler.response(ErrorHandler.BYTE_CONVERSION_FAILED, HttpStatus.BAD_REQUEST);
 			}
-			return base64File;
+			return ResponseEntity.status(HttpStatus.ACCEPTED).body(base64File);
 
 	}
 
 	public ResponseEntity<?> getFilesById(Integer id) {
-		Optional<FileAttachment> attachment=attachmentRepository.findById(id);
+		FileAttachment attachment=attachmentRepository.findById(id).get();
 		
-		if(attachment.isPresent())
-		{
-			attachment.get();
+		
+			byte[] attachmentFile;
 			
-			return ResponseEntity.status(HttpStatus.ACCEPTED).body(attachment);
-		}
-		else {
-			return ErrorHandler.response(ErrorHandler.FILE_NOT_FOUND, HttpStatus.NOT_FOUND);
-		}
+			if(attachment.getId().equals(id))
+			{
+				log.info("id is:"+attachment.getId().equals(id));
+			try {
+				attachmentFile=Files.readAllBytes(new File(attachment.getFilePath()).toPath());
+				String downloadedFile=Base64.getEncoder().encodeToString(attachmentFile);
+				return ResponseEntity.status(HttpStatus.ACCEPTED).body(downloadedFile);
+			} catch (IOException e) {
+			
+				e.printStackTrace();
+			}
+			
+			}
+			else {
+				return ErrorHandler.response(ErrorHandler.FILE_NOT_FOUND, HttpStatus.NOT_FOUND);
+			}
+		
+		return null;
 	}
 }
