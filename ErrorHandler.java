@@ -8,9 +8,9 @@ public class ErrorHandler {
 	
 	public static final String INVALID_FILE_UPLOAD="Uploaded file is not PDF";
 	
-	public static final String FILE_SIZE_EXCEEDS="File Size Exceeds, Please Upload file within 500Kb";
+	public static final String FILE_SIZE_EXCEEDS="File Size Exceeds, Please Upload file within 40MB";
 	
-	public static final String FILE_UPLOAD_FAILED="File upload failed";
+	public static final String FILE_UPLOAD_FAILED="File upload failed, No File Found";
 	
 	public static final String FILE_COPY_FAILED="Transferring the files failed";
 	
@@ -20,11 +20,15 @@ public class ErrorHandler {
 	
 	public static final String FILE_NOT_FOUND="File not found in Database";
 	
-	public static final String FILE_ID_EMPTY="File id is Null";
+	public static final String FILE_ID_EMPTY="File id or Value is Empty else Incorrect, Kindly recheck!";
 	
 	public static final String FILE_UPLOAD="File Upload Successfully";
 	
 	public static final String FILE_RETRIVED="File Retrieved Successfully";
+	
+	public static final String ENCODE_FAILED="failed to encode to Base64 Format";
+	
+	public static final String FILE_NAME_EMPTY="Required field Key is Empty or Incorrect, Please recheck!";
 	
 	public static ResponseEntity<?> response(String error, HttpStatus httpStatus)
 	{
@@ -45,6 +49,11 @@ public class ErrorHandler {
 			return new ResponseEntity<Object>(errorResponse,httpStatus);
 		}
 		else if(httpStatus.value()==406)
+		{
+			errorResponse.setError(error);
+			return new ResponseEntity<Object>(errorResponse,httpStatus);
+		}
+		else if(httpStatus.value()==409)
 		{
 			errorResponse.setError(error);
 			return new ResponseEntity<Object>(errorResponse,httpStatus);
